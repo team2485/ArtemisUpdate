@@ -17,6 +17,7 @@ public final class Constants {
   public static final double NOMINAL_VOLTAGE = 12;
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    public static final double kControllerDeadband = .08;
   }
   public static final class Feeder {
     public static final int SPARK_PORT = 33;
@@ -181,5 +182,41 @@ public final class Constants {
     public static final int CURRENT_PIPELINE = 6;
 
     public static final double FINE_VELOCITY = 20;
+  }
+
+  public static final class HoodConstants {
+    public static final int SPARK_PORT = 32;
+    public static final double SPARK_HOOD_MAX_CURRENT = 0;
+
+    public static final int ENCODER_CPR = 1000 * 4; //4x encoding
+    public static final double DISTANCE_PER_REVOLUTION = 360;
+
+    public static final double HOOD_LEAD_SCREW_GEAR_RATIO = 1.0/5;
+
+    // these are relative to the vertical axis
+    public static final double HOOD_BOTTOM_POSITION_DEG = 10;
+    public static final double HOOD_TOP_POSITION_DEG = 42;
+
+
+    public static final String TAB_NAME = "Shooter";
+
+    //both in radians relative to horizontal
+    //check if these should be in degrees or radians
+    public static final double MAX_THETA = Math.toRadians(HOOD_TOP_POSITION_DEG);
+    public static final double MIN_THETA = Math.toRadians(HOOD_BOTTOM_POSITION_DEG);
+
+    public static final double AUTO_HOOD_MANUAL_ADJUST = 0;
+
+    public static final double MANUAL_ANGLE_SCALE = 20;
+
+    public static final String HOOD_VELOCITY_CONTROLLER_CONFIGURABLE_LABEL = "hoodVelocityController";
+    public static final String HOOD_POSITION_CONTROLLER_CONFIGURABLE_LABEL = "hoodPositionController";
+
+    public static final double HOOD_MAX_VELOCITY = 2500;
+    public static final double HOOD_MIN_VELOCITY = -2500;
+
+    public static final double BUFFER_ZONE_SIZE = 6;
+
+    public static final double HOOD_DEFAULT_INCREMENT = -10;
   }
 }

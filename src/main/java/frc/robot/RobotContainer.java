@@ -8,12 +8,14 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveWithControllers;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.HoodMove;
 import frc.robot.commands.RunIndex;
 import frc.robot.commands.SpinFlywheel;
 import frc.robot.commands.TurretMove;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.GeneralMagazine;
+import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Turret;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,6 +39,7 @@ public class RobotContainer {
   private final RunIndex runIndex = new RunIndex(m_lowMagazine,m_highMagazine);
   private final SpinFlywheel spinFly = new SpinFlywheel(m_Shooter);
   private final Turret m_turret = new Turret();
+  private final Hood m_hood = new Hood();
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -45,6 +48,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+    
   }
 
   /**
@@ -59,6 +63,7 @@ public class RobotContainer {
   private void configureBindings() {
     m_drivetrain.setDefaultCommand(new DriveWithControllers(m_drivetrain, ()-> m_driverController.getLeftX(), ()-> m_driverController.getLeftY()));
     m_turret.setDefaultCommand(new TurretMove(m_turret, ()-> m_driverController.getRightX()));
+    m_hood.setDefaultCommand(new HoodMove(m_hood, ()-> m_driverController.getRightY()));
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     new Trigger(m_exampleSubsystem::exampleCondition)
         .onTrue(new ExampleCommand(m_exampleSubsystem));

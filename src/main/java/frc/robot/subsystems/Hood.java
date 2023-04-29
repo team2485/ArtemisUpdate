@@ -4,21 +4,21 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxLimitSwitch;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.TurretConstants;
+import frc.robot.Constants.HoodConstants;
+import frc.robot.Constants;
 
-public class Turret extends SubsystemBase {
+public class Hood extends SubsystemBase {
   /** Creates a new Turret. */
 
-  private final TalonSRX m_talon;
+  private final CANSparkMax m_spark;
 
   private final PIDController m_positionController;
 
@@ -28,40 +28,38 @@ public class Turret extends SubsystemBase {
   private boolean centered = false;
 
 
-  public Turret() {
-      m_talon = new TalonSRX(TurretConstants.TALON_PORT);
-      m_talon.configNominalOutputForward(0);
-      m_talon.configNominalOutputReverse(0);
-      m_talon.configPeakOutputForward(1);
-      m_talon.configPeakOutputReverse(-1);
-      m_talon.enableVoltageCompensation(true);
-      m_talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-      m_talon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyClosed);
-      m_talon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyClosed);
-
+  public Hood() {
+      m_spark = new CANSparkMax(HoodConstants.SPARK_PORT, MotorType.kBrushless);
+      m_spark.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).enableLimitSwitch(false);
+      m_spark.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).enableLimitSwitch(false);
+      m_spark.enableVoltageCompensation(Constants.NOMINAL_VOLTAGE);
       m_positionController = new PIDController(.25, .05, 0);
   }
 
   @Override
   public void periodic() {
+    //SmartDashboard.putBoolean("Limit", getForwardLimitSwitch());
+    SmartDashboard.putNumber("m_spark", m_spark.getEncoder().getPosition());
     if (!upperBoundFound) {
-      runTalon(.2);
+      runSpark(-.2);
       if (getForwardLimitSwitch()) {
-        maxDistance = m_talon.getSelectedSensorPosition();
+        //upper bound on the hood is the lesser number
+        minDistance = m_spark.getEncoder().getPosition();
         upperBoundFound = true;
       }
     }
     else if (!lowerBoundFound) {
-      runTalon(-.2);
+      runSpark(.2);
       if (getReverseLimitSwitch()) {
-        minDistance = m_talon.getSelectedSensorPosition();
+        //lower bound on the hood is the greater number
+        maxDistance = m_spark.getEncoder().getPosition();
         lowerBoundFound = true;
       }
     }
     else if (!centered) {
       runPositionalPID(0);
       if (Math.abs(0 - getEncoderDistance()) < .05) {
-        runTalon(0);
+        runSpark(0);
         centered = true;
       }
     }
@@ -70,25 +68,25 @@ public class Turret extends SubsystemBase {
   public void runPositionalPID(double position) {
     m_positionController.setSetpoint(MathUtil.clamp(position, -1, 1));
     if (Math.abs(m_positionController.getSetpoint() - getEncoderDistance()) > .01)
-      runTalon(m_positionController.calculate(getEncoderDistance()));
+      runSpark(m_positionController.calculate(getEncoderDistance()));
     else 
-      runTalon(0);
+      runSpark(0);
   }
 
-  public void runTalon(double power) {
-    m_talon.set(ControlMode.PercentOutput, power);
+  public void runSpark(double power) {
+    m_spark.set(power);
   }
 
   public boolean getForwardLimitSwitch() {
-    return !m_talon.getSensorCollection().isFwdLimitSwitchClosed();
+    return m_spark.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).isPressed();
   }
 
   public boolean getReverseLimitSwitch() {
-    return !m_talon.getSensorCollection().isRevLimitSwitchClosed();
+    return m_spark.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).isPressed();
   }
 
   public double getEncoderDistance() {
-    return map(m_talon.getSelectedSensorPosition(), minDistance, maxDistance, -1, 1);
+    return map(m_spark.getEncoder().getPosition(), minDistance, maxDistance, -1, 1);
   }
 
   private double map(double x, double in_min, double in_max, double out_min, double out_max) {

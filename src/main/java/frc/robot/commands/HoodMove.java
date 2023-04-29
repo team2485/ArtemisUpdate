@@ -9,15 +9,15 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.Turret;
+import frc.robot.subsystems.Hood;
 
-public class TurretMove extends CommandBase {
+public class HoodMove extends CommandBase {
   /** Creates a new TurretMove. */
-  private final Turret m_turret;
+  private final Hood m_hood;
   private DoubleSupplier axis;
-  public TurretMove(Turret m_turret, DoubleSupplier axis) {
-    this.m_turret = m_turret;
-    addRequirements(m_turret);
+  public HoodMove(Hood m_hood, DoubleSupplier axis) {
+    this.m_hood = m_hood;
+    addRequirements(m_hood);
     // Use addRequirements() here to declare subsystem dependencies.
     this.axis = axis;
   }
@@ -29,10 +29,10 @@ public class TurretMove extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!m_turret.getWasCentered()) return;
+    if (!m_hood.getWasCentered()) return;
     //targetPosition += xAxis.getAsDouble() * .05;
     //targetPosition = MathUtil.clamp(, -1, 1);
-    m_turret.runPositionalPID(m_turret.getEncoderDistance() + MathUtil.applyDeadband(axis.getAsDouble(), OperatorConstants.kControllerDeadband));
+    m_hood.runPositionalPID(m_hood.getEncoderDistance() + MathUtil.applyDeadband(axis.getAsDouble(), OperatorConstants.kControllerDeadband));
   }
 
   // Called once the command ends or is interrupted.
