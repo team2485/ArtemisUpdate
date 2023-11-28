@@ -21,16 +21,17 @@ public class Shooter extends SubsystemBase {
   private CANSparkMax m_feeder;
   private PIDController m_leftController;
   private PIDController m_rightController;
-  private PIDController m_feedeController;
+  private PIDController m_feederController;
   public Shooter(int leftPort, int rightPort,int feederPort) {
 
     m_left=new CANSparkMax(leftPort, MotorType.kBrushless);
     m_right=new CANSparkMax(rightPort, MotorType.kBrushless);
     m_feeder = new CANSparkMax(feederPort, MotorType.kBrushless);
     m_right.setInverted(true);
+
     m_leftController = new PIDController(1, 0, 0);
     m_rightController = new PIDController(1, 0, 0);
-    m_feedeController = new PIDController(1, 0, 0);
+    m_feederController = new PIDController(1, 0, 0);
 
     m_left.getEncoder().setVelocityConversionFactor(Constants.Flywheels.GEAR_RATIO);
     m_right.getEncoder().setVelocityConversionFactor(Constants.Flywheels.GEAR_RATIO);
@@ -39,6 +40,8 @@ public class Shooter extends SubsystemBase {
     m_left.setIdleMode(CANSparkMax.IdleMode.kCoast);
     m_right.setIdleMode(CANSparkMax.IdleMode.kCoast);
     m_feeder.setIdleMode(CANSparkMax.IdleMode.kCoast);
+
+    m_feeder.setInverted(false);
 
     m_right.setSmartCurrentLimit(Constants.Flywheels.SPARK_FLYWHEEL_LEFT_MAX_CURRENT);
     m_left.setSmartCurrentLimit(Constants.Flywheels.SPARK_FLYWHEEL_RIGHT_MAX_CURRENT);
@@ -54,6 +57,7 @@ public class Shooter extends SubsystemBase {
   }
   private void setLeftPWM(double pwm) {
     m_left.set(pwm);
+    
 }
 
   private void setRightPWM(double pwm) {
@@ -102,8 +106,10 @@ public double getRightEncoderVelocity() {
 public void runVelocityPID(double velocity,double feederVel) {
   //m_spark.runPID(MathUtil.clamp(velocity, Constants.Magazine.MAGAZINE_MIN_VELOCITY, Constants.Magazine.MAGAZINE_MAX_VELOCITY));
   m_left.set(m_leftController.calculate(velocity));
+  
   m_right.set(m_rightController.calculate(velocity));
-  m_feeder.set(m_feedeController.calculate(feederVel));
+  m_feeder.set(m_feederController.calculate(feederVel));
+  
 }
 
   @Override

@@ -22,7 +22,7 @@ import frc.robot.Constants.Magazine;
 
 public class GeneralMagazine extends SubsystemBase {
 
-    private final CANSparkMax m_spark;
+   private final CANSparkMax m_spark;
    private final PIDController m_controller;
 
 

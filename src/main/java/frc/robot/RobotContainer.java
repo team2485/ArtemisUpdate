@@ -9,6 +9,8 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.DriveWithControllers;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.HoodMove;
+import frc.robot.commands.IntakeArmMove;
+import frc.robot.commands.Outtake;
 import frc.robot.commands.RunIndex;
 import frc.robot.commands.SpinFlywheel;
 import frc.robot.commands.TurretMove;
@@ -16,7 +18,10 @@ import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.GeneralMagazine;
 import frc.robot.subsystems.Hood;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.IntakeArm;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.TrainingShooter;
 import frc.robot.subsystems.Turret;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -36,7 +41,10 @@ public class RobotContainer {
   private final GeneralMagazine m_lowMagazine = new GeneralMagazine(Constants.Magazine.SPARK_LOW_PORT,Constants.Magazine.LOW_GEAR_RATIO,Constants.Magazine.SPARK_LOW_MAX_CURRENT,true);
   private final GeneralMagazine m_highMagazine = new GeneralMagazine(Constants.Magazine.SPARK_HIGH_PORT,Constants.Magazine.HIGH_GEAR_RATIO,Constants.Magazine.SPARK_HIGH_MAX_CURRENT,false);
   private final Shooter m_Shooter = new Shooter(Constants.Flywheels.SPARK_FLYWHEEL_LEFT_PORT, Constants.Flywheels.SPARK_FLYWHEEL_RIGHT_PORT,Constants.Feeder.SPARK_PORT);
-  private final RunIndex runIndex = new RunIndex(m_lowMagazine,m_highMagazine);
+  private final Intake m_intake = new Intake(27, 26);
+  private final IntakeArm m_intakeArm = new IntakeArm();
+  private final RunIndex runIndex = new RunIndex(m_lowMagazine, m_highMagazine, m_intake);
+  private final Outtake outtake = new Outtake(m_lowMagazine, m_highMagazine, m_intake);
   private final SpinFlywheel spinFly = new SpinFlywheel(m_Shooter);
   private final Turret m_turret = new Turret();
   private final Hood m_hood = new Hood();
@@ -71,7 +79,10 @@ public class RobotContainer {
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
     m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-    m_driverController.a().whileTrue(new InstantCommand(()-> runIndex.execute())).onFalse(new InstantCommand(()->runIndex.end(false)));
+    m_driverController.rightTrigger()
+                      .whileTrue(new InstantCommand(()-> runIndex.execute()).alongWith(new IntakeArmMove(m_intakeArm, IntakeArmMove.IntakeArmPosition.BOTTOM, Constants.IntakeArm.DOWN_SPEED)))
+                      .whileFalse(new InstantCommand(()->runIndex.end(false)).alongWith(new IntakeArmMove(m_intakeArm, IntakeArmMove.IntakeArmPosition.TOP, Constants.IntakeArm.UP_SPEED)));
+    m_driverController.a().whileTrue(new InstantCommand(()-> outtake.execute())).onFalse(new InstantCommand(()->outtake.end(false)));
     m_driverController.x().whileTrue(new InstantCommand(()-> spinFly.execute())).onFalse(new InstantCommand(()->spinFly.end(false)));
   }
 

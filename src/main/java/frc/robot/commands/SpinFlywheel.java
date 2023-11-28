@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.GeneralMagazine;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.TrainingShooter;
 
 public class SpinFlywheel extends CommandBase {
   /** Creates a new Index. */
@@ -22,12 +23,15 @@ public class SpinFlywheel extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    System.out.println("i received the command!");
+
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_Shooter.runVelocityPID(.3, 1);
+    m_Shooter.runVelocityPID(.35, 1);
   }
 
   // Called once the command ends or is interrupted.

@@ -87,6 +87,26 @@ public final class Constants {
     public static final int kBackRightMotorPort = 12;
   }
 
+  public static final class IntakeArm {
+
+    public static final int MAX_CURRENT = 2; //amps
+
+    public static final int TALON_PORT = 18;
+
+    public static final int ENCODER_DIO_PORT = 0;
+
+    public static final double ENCODER_PULSES_PER_REVOLUTION = 174.9;
+
+    public static final double TOP_POSITION_DEGREES = 0;
+
+    public static final double BOTTOM_POSITION_DEGREES = 90; //temp
+
+    public static final double UP_SPEED = 0.7;
+    public static final double DOWN_SPEED = 0.7;
+
+
+}
+
   public static final class Magazine {
 
     public static final int SPARK_LOW_MAX_CURRENT = 80;
